@@ -434,7 +434,29 @@ class BacktestEngine:
 # ============================================================================
 # STREAMLIT UI
 # ============================================================================
+from sklearn.linear_model import LinearRegression
 
+def predict_portfolio_growth(balance_history, days_to_predict=30):
+    """
+    Predicts future portfolio value using Linear Regression on historical performance.
+    """
+    if not balance_history or len(balance_history) < 5:
+        return None, None
+    
+    # Prepare data for regression
+    days = np.array(range(len(balance_history))).reshape(-1, 1)
+    values = np.array(balance_history).reshape(-1, 1)
+    
+    # Train model
+    model = LinearRegression()
+    model.fit(days, values)
+    
+    # Predict future
+    last_day = len(balance_history)
+    future_days = np.array(range(last_day, last_day + days_to_predict)).reshape(-1, 1)
+    future_values = model.predict(future_days)
+    
+    return future_days.flatten(), future_values.flatten()
 def main():
     st.set_page_config(page_title="Python Trading Simulator", page_icon="📈", layout="wide")
 
